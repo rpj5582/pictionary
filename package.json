@@ -1,0 +1,29 @@
+{
+  "name": "pictionary",
+  "version": "1.0.0",
+  "description": "A small web-based game of Pictionary.",
+  "main": "./src/server.js",
+  "scripts": {
+    "start": "node ./src/server.js",
+    "pretest": "eslint ./src --fix",
+    "test": "echo \"Tests complete\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rpj5582/pictionary.git"
+  },
+  "author": "Ryan Jones",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rpj5582/pictionary/issues"
+  },
+  "homepage": "https://github.com/rpj5582/pictionary#readme",
+  "dependencies": {
+    "socket.io": "^1.7.3"
+  },
+  "devDependencies": {
+    "eslint": "^3.17.0",
+    "eslint-config-airbnb": "^14.1.0",
+    "eslint-plugin-import": "^2.2.0"
+  }
+}
