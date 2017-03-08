@@ -1,0 +1,43 @@
+@import url('https://fonts.googleapis.com/css?family=Boogaloo');
+
+canvas {
+  border-style: solid;
+  border-width: 2px;
+  display: block;
+  margin: 0 auto;
+}
+
+h1 {
+  text-align: center;
+  font-family: 'Boogaloo';
+  font-weight: bold;
+  font-size: 48pt;
+  margin: 2%;
+  color: black;
+  -webkit-text-fill-color: white;
+  -webkit-text-stroke: 1px black;
+}
+
+body {
+  background-color: lightgoldenrodyellow;
+}
+
+textarea {
+  resize: none;
+  width: 100%;
+}
+
+aside {
+  float: left;
+  width: 15%;
+}
+
+section {
+  float right;
+  width: 85%;
+}
+
+ul {
+  list-style: none;
+  padding-left: 0;
+}

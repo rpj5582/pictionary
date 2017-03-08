@@ -1,0 +1,45 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="main.css">
+    
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
+    <script src="cursor.js"></script>
+    <script src="app.js"></script>
+  </head>
+  <body>
+    <img src="pencil.png" id="pencil" style="display: none;" />
+    
+    <h1>Pictionary!</h1>
+    
+    <aside>
+      <form>
+        <ul>
+          <li><input id="pencilRadio" type="radio" name="drawType" value="pencil" checked />Pencil</li>
+          <li><input id="eraserRadio" type="radio" name="drawType" value="eraser" />Eraser</li>
+        </ul>
+      </form>
+      <ul>
+        <li>Size</li>
+        <li><input id="strokeSizeSlider" type="range" min="1" max="50" step="1" value="2" /></li>
+      </ul>
+      <ul>
+        <li><input id="clearButton" type="button" value="Clear Canvas" /></li>
+      </ul>
+
+      <textarea id="chatHistory" rows="25" readonly></textarea>
+      
+      <ul>
+        <li><textarea id ="chatBox" rows="2"></textarea></li>
+        <li><input id="sendChatButton" type="button" value="Send" /></li>
+      </ul>
+    </aside>
+    
+    
+    <section>
+      <canvas width="640" height="480">
+        Your browser doesn't support canvas and can't run this app. Consider upgrading your browser.
+      </canvas>
+    </section>
+  </body>
+</html>
