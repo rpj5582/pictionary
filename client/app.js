@@ -1,5 +1,8 @@
 class App {
   constructor() {
+    this.socket = undefined;
+    
+    //---- Sets up canvas controls
     const pencilRadioButton = document.querySelector('#pencilRadio');
     const eraserRadioButton = document.querySelector('#eraserRadio');
     const strokeSizeSlider = document.querySelector('#strokeSizeSlider');
@@ -10,43 +13,97 @@ class App {
     const sendChatButton = document.querySelector('#sendChatButton');
 
     pencilRadioButton.addEventListener('click', () => {
-      this.dynCtx.strokeStyle = 'black';
+      this.gameBoard.setLineColor('black');
     });
 
     eraserRadioButton.addEventListener('click', () => {
-      this.dynCtx.strokeStyle = 'white';
+      this.gameBoard.setLineColor('white');
     });
 
     strokeSizeSlider.addEventListener('change', (e) => {
-      this.dynCtx.lineWidth = e.target.value;
+      this.gameBoard.setLineWidth(e.target.value);
     });
 
     clearButton.addEventListener('click', (e) => {
-      this.clear();
-      this.sendClearToServer();
+      this.gameBoard.clear();
+      this.socket.emit('clear');
     });
 
-    sendChatButton.addEventListener('click', () => {
+    const sendMessage = () => {
       const message = chatBox.value;
       chatBox.value = '';
 
       this.socket.emit('msg', message);
+    };
+    
+    sendChatButton.addEventListener('click', () => {
+      sendMessage();
     });
+    
+    chatBox.addEventListener('keyup', (e) => {
+      e.preventDefault();
+      if(e.keyCode === 13) {
+        sendMessage();
+      }
+    });
+    //----
+    
+    //---- Sets up username popup window controls
+    const popupWindow = document.querySelector('#popupWindow');
+    const usernameTextField = document.querySelector('#usernameTextField');
+    const badUsernameText = document.querySelector('#badUsernameText');
+    const usernameSubmitButton = document.querySelector('#usernameSubmitButton');
+    
+    const connect = () => {
+      const username = usernameTextField.value;
+      
+      this.socket = io.connect('', { query: `username=${username}` });
+      
+      this.socket.on('connect', () => {
+        this.onReconnecting();
+        this.onReconnect();
+        this.onReconnectFailed();
+        this.onDisconnect();
+        this.onUsername();
+        this.onLineDraw();
+        this.onClear();
+        this.onDrawHistory();
+        this.onMsg();
+      });
+    };
+    
+    usernameSubmitButton.addEventListener('click', connect);
+    usernameTextField.addEventListener('keyup', (e) => {
+      e.preventDefault();
+      if(e.keyCode === 13) {
+        connect();
+      }
+    });
+    //----
 
-    this.socket = io.connect();
-
-    this.gameBoard = new GameBoard(this.socket);
+    const canvas = document.querySelector('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    this.gameBoard = new GameBoard(canvas, ctx);
     this.gameBoard.setLineWidth(strokeSizeSlider.value);
     
-    this.socket.on('connect', () => {
-      this.onReconnecting();
-      this.onReconnect();
-      this.onReconnectFailed();
-      this.onDisconnect();
-      this.onLineDraw();
-      this.onClear();
-      this.onDrawHistory();
-      this.onMsg();
+    const pencilImg = document.querySelector('#pencil');
+    this.cursor = new Cursor(canvas, ctx, pencilImg);
+    
+    canvas.addEventListener('mousemove', (e) => {
+      if (this.cursor.isDrawing) {
+        const line = {
+          startX: this.cursor.prevX,
+          startY: this.cursor.prevY,
+          endX: this.cursor.posX,
+          endY: this.cursor.posY,
+          lineWidth: this.gameBoard.getLineWidth(),
+          strokeStyle: this.gameBoard.getLineColor()
+        };
+
+        this.gameBoard.drawLine(line);
+        this.socket.emit('drawLine', line);
+      }
     });
   }
 
@@ -76,6 +133,34 @@ class App {
     });
   }
 
+  onUsername() {
+    this.socket.on('username', (type) => {    
+      switch(type) {
+        case 'invalid': {
+          badUsernameText.innerHTML = 'Please enter a valid username';
+          break;
+        }
+          
+        case 'taken': {
+          badUsernameText.innerHTML = 'Someone already has that username';
+          break;
+        }
+          
+        case 'valid': {
+          popupWindow.style.display = 'none';
+          break;
+        }
+          
+        default: {
+          badUsernameText.innerHTML = 'Unknown error in connection';
+          break;
+        }
+      }
+
+      badUsernameText.style.display = 'inline';
+    });
+  }
+  
   onLineDraw() {
     this.socket.on('drawLine', this.gameBoard.drawLine.bind(this.gameBoard));
   }
@@ -99,7 +184,7 @@ class App {
       this.addChatMsg(message);
     });
   }
-
+  
   addChatMsg(message) {
     this.chatHistory.value += `${message}\n`;
   }
@@ -108,11 +193,8 @@ class App {
     requestAnimationFrame(this.update.bind(this));
 
     this.gameBoard.draw();
-  }
-
-  sendClearToServer() {
-    this.socket.emit('clear');
-  }  
+    this.cursor.draw();
+  } 
 }
 
 window.onload = () => {

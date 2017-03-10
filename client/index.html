@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" type="text/css" href="main.css">
@@ -10,6 +11,17 @@
   </head>
   <body>
     <img src="pencil.png" id="pencil" style="display: none;" />
+    
+    <div id="popupWindow">
+      <div id="popupWindowChild">
+        <p>Enter your username</p>
+        <p id="badUsernameText"></p>
+        <div>
+          <input id="usernameTextField" type="text" />
+          <input id="usernameSubmitButton" type="button" value="Submit" />
+        </div>
+      </div>
+    </div>
     
     <h1>Pictionary!</h1>
     
@@ -31,7 +43,7 @@
       <textarea id="chatHistory" rows="25" readonly></textarea>
       
       <ul>
-        <li><textarea id ="chatBox" rows="2"></textarea></li>
+        <li><input id ="chatBox" type="text" /></li>
         <li><input id="sendChatButton" type="button" value="Send" /></li>
       </ul>
     </aside>

@@ -1,6 +1,5 @@
 class Cursor {
-  constructor(socket, canvas, ctx, cursorImg) {
-    this.socket = socket;
+  constructor(canvas, ctx, cursorImg) {
     this.canvas = canvas;
     this.ctx = ctx;
     this.cursorImg = cursorImg;
@@ -10,7 +9,6 @@ class Cursor {
     this.prevY = 0;
     this.isDrawing = false;
 
-    // ---- Sets up canvas mouse input events
     this.canvas.addEventListener('mousemove', (e) => {
       const rect = this.canvas.getBoundingClientRect();
 
@@ -32,7 +30,6 @@ class Cursor {
     this.canvas.addEventListener('mouseout', () => {
       this.isDrawing = false;
     });
-    //----
   }
 
   draw() {

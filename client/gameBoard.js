@@ -1,10 +1,8 @@
 class GameBoard {
-  constructor(socket) {
-    this.socket = socket;
+  constructor(canvas, ctx) {
+    this.canvas = canvas;
+    this.ctx = ctx;
     
-    this.canvas = document.querySelector('canvas');
-    this.ctx = this.canvas.getContext('2d');
-
     this.dynCanvas = document.createElement('canvas');
     this.dynCanvas.width = this.canvas.width;
     this.dynCanvas.height = this.canvas.height;
@@ -17,29 +15,22 @@ class GameBoard {
     
     this.dynCtx.lineCap = 'round';
     this.dynCtx.lineJoin = 'round';
-    
-    const pencilImg = document.querySelector('#pencil');
-    this.cursor = new Cursor(this.socket, this.canvas, this.ctx, pencilImg, this.dynCanvas);
-    
-    this.canvas.addEventListener('mousemove', (e) => {
-      if (this.cursor.isDrawing) {
-        const line = {
-          startX: this.cursor.prevX,
-          startY: this.cursor.prevY,
-          endX: this.cursor.posX,
-          endY: this.cursor.posY,
-          lineWidth: this.dynCtx.lineWidth,
-          strokeStyle: this.dynCtx.strokeStyle,
-        };
-
-        this.drawToDynamicCanvas(line);
-        this.socket.emit('drawLine', line);
-      }
-    });
+  }
+  
+  getLineWidth() {
+    return this.dynCtx.lineWidth;
+  }
+  
+  getLineColor() {
+    return this.dynCtx.strokeStyle;
   }
   
   setLineWidth(lineWidth) {
     this.dynCtx.lineWidth = lineWidth;
+  }
+  
+  setLineColor(lineColor) {
+    this.dynCtx.strokeStyle = lineColor;
   }
   
   drawLine(line) {
@@ -64,6 +55,5 @@ class GameBoard {
   draw() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.ctx.drawImage(this.dynCanvas, 0, 0);
-    this.cursor.draw();
   }
 }

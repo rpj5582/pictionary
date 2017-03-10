@@ -2,9 +2,9 @@
   "name": "pictionary",
   "version": "1.0.0",
   "description": "A small web-based game of Pictionary.",
-  "main": "./src/server.js",
+  "main": "./src/main.js",
   "scripts": {
-    "start": "node ./src/server.js",
+    "start": "node ./src/main.js",
     "pretest": "eslint ./src --fix",
     "test": "echo \"Tests complete\""
   },
