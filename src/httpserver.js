@@ -6,7 +6,7 @@ class HTTPSever {
     this.PORT = process.env.PORT || process.env.NODE_PORT || 3000;
   }
 
-  onRequest(request, response) {
+  static onRequest(request, response) {
     switch (request.url) {
       case '/cursor.js': {
         fs.readFile(`${__dirname}/../client/cursor.js`, (cursorError, cursorData) => {

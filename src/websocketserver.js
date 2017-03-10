@@ -85,7 +85,7 @@ class WebSocketServer {
     socket.broadcast.to('room1').emit('clear');
   }
 
-  onMsg(io, socket, message) {
+  static onMsg(io, socket, message) {
     if (message !== '' && message !== null) {
       io.sockets.in('room1').emit('msg', `${socket.user.name}: ${message}`);
     }

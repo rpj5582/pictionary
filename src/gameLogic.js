@@ -8,10 +8,11 @@ class GameLogic {
     this.turnCount = 0;
   }
 
-  addPlayer(username) {
+  addPlayer(username, socket) {
     this.players.push({
       username,
-      isTurn: false,
+      socket,
+      isDrawing: false,
       score: 0,
     });
 
@@ -37,6 +38,11 @@ class GameLogic {
   startGame() {
     this.gameStarted = true;
     // send game started
+
+    const drawingPlayer = this.players[this.turnCount];
+    drawingPlayer.isDrawing = true;
+
+    // send drawing player
   }
 }
 
