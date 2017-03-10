@@ -17,7 +17,7 @@ class WebSocketServer {
     io.sockets.on('connection', (socket) => {
       this.onConnect(io, socket);
     });
-    
+
     this.gameLogic = new GameLogic(io);
 
     console.log('Websocket server started');
@@ -25,7 +25,7 @@ class WebSocketServer {
 
   onConnect(io, sock) {
     const socket = sock;
-    
+
     const username = socket.handshake.query.username;
     if (username === null || username === '') {
       socket.emit('username', 'invalid');
@@ -86,7 +86,7 @@ class WebSocketServer {
   }
 
   onMsg(io, socket, message) {
-    if(message !== '' && message !== null) {
+    if (message !== '' && message !== null) {
       io.sockets.in('room1').emit('msg', `${socket.user.name}: ${message}`);
     }
   }
