@@ -77,7 +77,7 @@ class HTTPSever {
   }
 
   start() {
-    const app = http.createServer(this.onRequest).listen(this.PORT);
+    const app = http.createServer(this.constructor.onRequest).listen(this.PORT);
     console.log(`HTTP server started on 127.0.0.1:${this.PORT}`);
     return app;
   }

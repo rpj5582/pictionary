@@ -54,7 +54,7 @@ class WebSocketServer {
       this.onClear(io, socket);
     });
     socket.on('msg', (message) => {
-      this.onMsg(io, socket, message);
+      this.constructor.onMsg(io, socket, message);
     });
 
     socket.join('room1');
