@@ -8,6 +8,8 @@ class App {
     const strokeSizeSlider = document.querySelector('#strokeSizeSlider');
     const clearButton = document.querySelector('#clearButton');
 
+    this.playerListTableBody = document.querySelector('#playerListTableBody');
+    
     this.chatHistory = document.querySelector('#chatHistory');
     const chatBox = document.querySelector('#chatBox');
     const sendChatButton = document.querySelector('#sendChatButton');
@@ -25,7 +27,6 @@ class App {
     });
 
     clearButton.addEventListener('click', (e) => {
-      this.gameBoard.clear();
       this.socket.emit('clear');
     });
 
@@ -65,10 +66,16 @@ class App {
         this.onReconnectFailed();
         this.onDisconnect();
         this.onUsername();
+        this.onCanDraw();
         this.onLineDraw();
         this.onClear();
         this.onDrawHistory();
         this.onMsg();
+        this.onClearMsg();
+        this.onAddPlayer();
+        this.onAddPlayers();
+        this.onRemovePlayer();
+        this.onSetScore();
       });
     };
     
@@ -161,6 +168,12 @@ class App {
     });
   }
   
+  onCanDraw() {
+    this.socket.on('canDraw', (canDraw) => {
+      this.cursor.canDraw = canDraw;
+    });
+  }
+  
   onLineDraw() {
     this.socket.on('drawLine', this.gameBoard.drawLine.bind(this.gameBoard));
   }
@@ -182,6 +195,75 @@ class App {
   onMsg() {
     this.socket.on('msg', (message) => {
       this.addChatMsg(message);
+    });
+  }
+  
+  onClearMsg() {
+    this.socket.on('clearMsg', () => {
+      this.chatHistory.value = '';
+    });
+    
+  }
+  
+  onAddPlayer() {
+    this.socket.on('addPlayer', (user) => {
+      const username = user.name;
+        
+      const tableDataName = document.createElement('td');
+      tableDataName.setAttribute('class', 'username');
+      tableDataName.innerHTML = username;
+
+      const tableDataScore = document.createElement('td');
+      tableDataScore.setAttribute('class', 'score');
+      tableDataScore.innerHTML = '0';
+
+      const tableRow = document.createElement('tr');
+      tableRow.setAttribute('id', username);
+
+      tableRow.appendChild(tableDataName);
+      tableRow.appendChild(tableDataScore);
+
+      this.playerListTableBody.appendChild(tableRow);
+    });
+  }
+  
+  onAddPlayers() {
+    this.socket.on('addPlayers', (users) => {
+      const keys = Object.keys(users);
+      for(let i = 0; i < keys.length; i++) {
+        const username = keys[i];
+        
+        const tableDataName = document.createElement('td');
+        tableDataName.setAttribute('class', 'username');
+        tableDataName.innerHTML = username;
+
+        const tableDataScore = document.createElement('td');
+        tableDataScore.setAttribute('class', 'score');
+        tableDataScore.innerHTML = '0';
+
+        const tableRow = document.createElement('tr');
+        tableRow.setAttribute('id', username);
+
+        tableRow.appendChild(tableDataName);
+        tableRow.appendChild(tableDataScore);
+
+        this.playerListTableBody.appendChild(tableRow);
+      }
+    });
+  }
+  
+  onRemovePlayer() {
+    this.socket.on('removePlayer', (username) => {
+      const tableRow = this.playerListTableBody.querySelector(`#${username}`);
+      this.playerListTableBody.removeChild(tableRow);
+    });
+  }
+  
+  onSetScore() {
+    this.socket.on('setScore', (user) => {
+      const tableRow = this.playerListTableBody.querySelector(`#${user.name}`);
+      const score = tableRow.querySelector('.score');
+      score.innerHTML = user.score;
     });
   }
   

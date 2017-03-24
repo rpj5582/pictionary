@@ -5,9 +5,6 @@ class WebSocketServer {
   constructor() {
     // A list of users
     this.users = {};
-
-    // A list of line objects, acting as a draw hsitory
-    this.lines = [];
   }
 
   start(httpServer) {
@@ -51,18 +48,22 @@ class WebSocketServer {
       this.onDrawLine(io, socket, line);
     });
     socket.on('clear', () => {
-      this.onClear(io, socket);
+      this.onClear(socket);
     });
     socket.on('msg', (message) => {
-      this.constructor.onMsg(io, socket, message);
+      this.onMsg(io, socket, message);
     });
 
     socket.join('room1');
 
+    socket.broadcast.to('room1').emit('addPlayer', socket.user);
+    socket.emit('addPlayers', this.users);
     io.sockets.in('room1').emit('msg', `${socket.user.name} has join the room.`);
 
     socket.emit('username', 'valid');
-    socket.emit('drawHistory', this.lines);
+    socket.emit('drawHistory', this.gameLogic.lines);
+
+    this.gameLogic.addPlayer(socket);
 
     console.log(`${socket.user.name} has connected.`);
   }
@@ -70,24 +71,42 @@ class WebSocketServer {
   onDisconnect(io, socket) {
     console.log(`${socket.user.name} has disconnected`);
 
+    io.sockets.in('room1').emit('removePlayer', socket.user.name);
     io.sockets.in('room1').emit('msg', `${socket.user.name} has left the room.`);
 
+    this.gameLogic.removePlayer(socket);
+
     delete this.users[socket.user.name];
+
+    const isEmpty = () => {
+      const keys = Object.keys(this.users);
+      if (keys.length === 0) return true;
+
+      return false;
+    };
+
+    if (isEmpty()) {
+      this.gameLogic.forceClearDrawing();
+    }
   }
 
   onDrawLine(io, socket, line) {
-    this.lines.push(line);
-    socket.broadcast.to('room1').emit('drawLine', line);
+    const playerCanDraw = this.gameLogic.canPlayerDraw(socket);
+    if (playerCanDraw) {
+      this.gameLogic.addToDrawing(line);
+      socket.broadcast.to('room1').emit('drawLine', line);
+    }
   }
 
-  onClear(io, socket) {
-    this.lines = [];
-    socket.broadcast.to('room1').emit('clear');
+  onClear(socket) {
+    this.gameLogic.clearDrawing(socket);
   }
 
-  static onMsg(io, socket, message) {
+  onMsg(io, socket, message) {
     if (message !== '' && message !== null) {
-      io.sockets.in('room1').emit('msg', `${socket.user.name}: ${message}`);
+      if (this.gameLogic.checkMessage(socket, message)) {
+        io.sockets.in('room1').emit('msg', `${socket.user.name}: ${message}`);
+      }
     }
   }
 }

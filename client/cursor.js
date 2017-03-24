@@ -7,6 +7,7 @@ class Cursor {
     this.posY = 0;
     this.prevX = 0;
     this.prevY = 0;
+    this.canDraw = false;
     this.isDrawing = false;
 
     this.canvas.addEventListener('mousemove', (e) => {
@@ -20,7 +21,9 @@ class Cursor {
     });
 
     this.canvas.addEventListener('mousedown', (e) => {
-      this.isDrawing = true;
+      if(this.canDraw) {
+        this.isDrawing = true;
+      }
     });
 
     this.canvas.addEventListener('mouseup', (e) => {
@@ -33,6 +36,8 @@ class Cursor {
   }
 
   draw() {
-    this.ctx.drawImage(this.cursorImg, this.posX, this.posY - this.cursorImg.height);
+    if(this.canDraw) {
+      this.ctx.drawImage(this.cursorImg, this.posX, this.posY - this.cursorImg.height);
+    }
   }
 }
